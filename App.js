@@ -1,20 +1,33 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import {StatusBar, Alert, FlatList, Text, View} from 'react-native';
+import styled from 'styled-components/native';
+import Post from "./Components/Post/Post";
+import axios from "axios";
+import {useEffect, useState} from "react";
+
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+    const [items, setItems] = useState([]);
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+    useEffect(() => {
+        axios.get('https://6612be9353b0d5d80f664b21.mockapi.io/Posts')
+        .then(({data}) => {
+            setItems(data);
+        })
+        .catch((err) => {
+            Alert.alert('Error HTTP: ' + err);
+        });
+
+    }, []);
+
+    return (
+        <View>
+            <FlatList
+                data={items}
+                renderItem={({item}) => {
+                    return <Post title={item.title} createdAt={item.createdAt} imageUrl={item.imageUrl} />
+                }}
+            />
+            <StatusBar theme="auto" />
+        </View>
+    );
+}
